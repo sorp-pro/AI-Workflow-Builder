@@ -1,0 +1,4 @@
+node_modules/
+*.log
+razbor-*.md
+otvety-*.md
