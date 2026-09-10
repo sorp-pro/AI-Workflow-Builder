@@ -18,7 +18,8 @@
 import { rmSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { userInfo } from 'node:os';
-import { прочитать, записать, где, согласился, кодПриглашения, ШЛЮЗ } from '../hooks/nastroyki.mjs';
+import { прочитать, записать, где, согласился, кодПриглашения } from '../hooks/nastroyki.mjs';
+import { позвать } from '../hooks/stend.mjs';
 
 const доводы = process.argv.slice(2);
 const флаг = (и) => доводы.includes(и);
@@ -54,23 +55,13 @@ function самоимя() {
   return { имя: null, откуда: null };
 }
 
+// Через общий способ связи: он умеет ходить через прокси изолированных сред,
+// а голый fetch там висит до таймаута.
 async function опознать(ключ) {
-  const сторож = new AbortController();
-  const будильник = setTimeout(() => сторож.abort(), 6000);
-  try {
-    const о = await fetch(ШЛЮЗ.replace(/\/$/, '') + '/whoami', {
-      signal: сторож.signal,
-      headers: { 'X-Builder-Key': ключ },
-    });
-    if (о.status === 401) return { опознан: false, почему: 'ключ не опознан или выключен' };
-    if (!о.ok) return { опознан: false, почему: `стенд ответил ${о.status}` };
-    const т = await о.json();
-    return { опознан: true, имя: т.имя, роль: т.роль };
-  } catch (е) {
-    return { опознан: false, почему: `стенд недоступен: ${е.message}` };
-  } finally {
-    clearTimeout(будильник);
-  }
+  const о = await позвать('/whoami', { ключ, ждать: 6000 });
+  if (о.код === 401) return { опознан: false, почему: 'ключ не опознан или выключен' };
+  if (!о.вышло) return { опознан: false, почему: о.почему ?? `стенд ответил ${о.код}` };
+  return { опознан: true, имя: о.тело.имя, роль: о.тело.роль };
 }
 
 // ---------- выход ----------
@@ -178,15 +169,14 @@ async function главное() {
   // стенд; плагин про это не знает и знать не должен.
   const код = названныйКод || кодПриглашения();
 
-  const о = await fetch(ШЛЮЗ.replace(/\/$/, '') + '/register', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json; charset=utf-8' },
-    body: JSON.stringify(код ? { name: имя, invite: код } : { name: имя }),
+  const о = await позвать('/register', {
+    метод: 'POST',
+    тело: код ? { name: имя, invite: код } : { name: имя },
   });
-  const т = await о.json().catch(() => ({}));
+  const т = о.тело;
 
-  if (!о.ok) {
-    console.error(`Не вышло: ${т.ошибка ?? о.status}`);
+  if (!о.вышло) {
+    console.error(`Не вышло: ${т.ошибка ?? о.почему ?? о.код}`);
     if (т.как_быть) console.error(т.как_быть);
     return 1;
   }
