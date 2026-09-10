@@ -172,21 +172,14 @@ async function главное() {
     console.log('Не то — назовитесь иначе: node bin/vhod.mjs "Ваше имя"\n');
   }
 
+  // Код передаётся, если он есть. Открыт стенд или спрашивает код — решает
+  // стенд; плагин про это не знает и знать не должен.
   const код = названныйКод || кодПриглашения();
-  if (!код) {
-    console.error(`Нужен код приглашения: node bin/vhod.mjs "${имя}" КОД`);
-    console.error('Его выдаёт тот, кто ведёт стенд: журнал общий, а репозиторий открытый,');
-    console.error('и без кода писать в него мог бы кто угодно.');
-    console.error('');
-    console.error('Чтобы участники не вводили код руками — положите его один раз');
-    console.error('в окружение: SORP_INVITE=…');
-    return 1;
-  }
 
   const о = await fetch(ШЛЮЗ.replace(/\/$/, '') + '/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json; charset=utf-8' },
-    body: JSON.stringify({ name: имя, invite: код }),
+    body: JSON.stringify(код ? { name: имя, invite: код } : { name: имя }),
   });
   const т = await о.json().catch(() => ({}));
 
