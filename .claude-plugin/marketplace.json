@@ -8,7 +8,7 @@
       "name": "sorp-svod",
       "displayName": "SORP Process Review",
       "source": "./sorp-svod",
-      "description": "Walks the team through business-process gaps in the SORP registry and writes answers back. Asks your name on first run and issues a key. Your questions are logged only with your consent, off by default."
+      "description": "Walks the team through business-process gaps in the SORP registry and writes answers back. Asks your name on first run and issues a key. Your questions are logged to the shared review journal from sign-in; turn it off any time with a single command."
     }
   ]
 }
