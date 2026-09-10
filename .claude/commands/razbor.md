@@ -8,7 +8,7 @@ description: Разбор процессов — пройти по местам,
 ## Начни с обзора
 
 ```bash
-node "$CLAUDE_PROJECT_DIR/sorp-svod/bin/razbor.mjs"
+node "$CLAUDE_PROJECT_DIR/sorp-svod/scripts/razbor.mjs"
 ```
 
 Скажи человеку одной строкой, сколько мест закрыто и сколько осталось. Не
@@ -18,7 +18,7 @@ node "$CLAUDE_PROJECT_DIR/sorp-svod/bin/razbor.mjs"
 ## Бери вопросы небольшими пачками
 
 ```bash
-node "$CLAUDE_PROJECT_DIR/sorp-svod/bin/razbor.mjs" --вопросы 5
+node "$CLAUDE_PROJECT_DIR/sorp-svod/scripts/razbor.mjs" --вопросы 5
 ```
 
 Пачками, а не всё сразу: мест нехватки больше тысячи, и человек, увидевший
@@ -46,8 +46,8 @@ node "$CLAUDE_PROJECT_DIR/sorp-svod/bin/razbor.mjs" --вопросы 5
 ## Записывай решения сразу
 
 ```bash
-node "$CLAUDE_PROJECT_DIR/sorp-svod/bin/razbor.mjs" --да 101387000000112977
-node "$CLAUDE_PROJECT_DIR/sorp-svod/bin/razbor.mjs" --нет 101387000000112977 "стол другой, ведёт DESK-012"
+node "$CLAUDE_PROJECT_DIR/sorp-svod/scripts/razbor.mjs" --да 101387000000112977
+node "$CLAUDE_PROJECT_DIR/sorp-svod/scripts/razbor.mjs" --нет 101387000000112977 "стол другой, ведёт DESK-012"
 ```
 
 Сразу, а не в конце: сессия обрывается, и час разговора пропадает целиком.

@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 // Вопросы разбора и ответы на них.
 //
-//   node bin/razbor.mjs                        сколько чего осталось
-//   node bin/razbor.mjs --вопросы [сколько]    следующие места нехватки
-//   node bin/razbor.mjs --да НОМЕР             предложенное подходит
-//   node bin/razbor.mjs --нет НОМЕР "чем"      не подходит, и вот чем
+//   node scripts/razbor.mjs                        сколько чего осталось
+//   node scripts/razbor.mjs --вопросы [сколько]    следующие места нехватки
+//   node scripts/razbor.mjs --да НОМЕР             предложенное подходит
+//   node scripts/razbor.mjs --нет НОМЕР "чем"      не подходит, и вот чем
 //
 // ── Почему вопросы приходят со стенда, а не из файла ─────────────────────────
 // Файл разбора нужно кому-то передать, а потом передать ещё раз, когда реестр
@@ -41,7 +41,7 @@ async function главное() {
     }
     const чем = нет ? доводы[доводы.indexOf('--нет') + 2] : null;
     if (нет && !чем) {
-      console.error('Скажите, чем не подходит: node bin/razbor.mjs --нет НОМЕР "чем именно"');
+      console.error('Скажите, чем не подходит: node scripts/razbor.mjs --нет НОМЕР "чем именно"');
       console.error('Отказ без причины бесполезен — на следующем прогоне движок предложит то же самое.');
       return 1;
     }
@@ -96,7 +96,7 @@ async function главное() {
   for (const с of о.тело.состояния || []) console.log(`  ${с.rec_state}: ${с.сколько}`);
   console.log('\nНа чём стоят предложения:');
   for (const о2 of о.тело.основания || []) console.log(`  ${о2.rec_ground}: ${о2.сколько}`);
-  console.log('\nСледующие вопросы: node bin/razbor.mjs --вопросы 5');
+  console.log('\nСледующие вопросы: node scripts/razbor.mjs --вопросы 5');
   return 0;
 }
 

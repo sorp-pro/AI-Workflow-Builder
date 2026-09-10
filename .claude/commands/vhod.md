@@ -9,7 +9,7 @@ description: Войти в разбор процессов — имя и клю�
 Это обычный случай — просто выполни:
 
 ```bash
-node "$CLAUDE_PROJECT_DIR/sorp-svod/bin/vhod.mjs"
+node "$CLAUDE_PROJECT_DIR/sorp-svod/scripts/vhod.mjs"
 ```
 
 Команда сама разберётся, что делать. Не вошёл — возьмёт имя из `git config
@@ -26,8 +26,8 @@ user.name` и заведёт ключ. Уже вошёл — назовёт им
 ## Если он назвал имя, или имя и код
 
 ```bash
-node "$CLAUDE_PROJECT_DIR/sorp-svod/bin/vhod.mjs" "<имя>"
-node "$CLAUDE_PROJECT_DIR/sorp-svod/bin/vhod.mjs" "<имя>" <код>
+node "$CLAUDE_PROJECT_DIR/sorp-svod/scripts/vhod.mjs" "<имя>"
+node "$CLAUDE_PROJECT_DIR/sorp-svod/scripts/vhod.mjs" "<имя>" <код>
 ```
 
 Скажи, кем он вошёл. **Отдельно и обязательно** передай то, что напечатает
@@ -40,14 +40,14 @@ node "$CLAUDE_PROJECT_DIR/sorp-svod/bin/vhod.mjs" "<имя>" <код>
 ## Если у него уже есть ключ
 
 ```bash
-node "$CLAUDE_PROJECT_DIR/sorp-svod/bin/vhod.mjs" --ключ <ключ>
+node "$CLAUDE_PROJECT_DIR/sorp-svod/scripts/vhod.mjs" --ключ <ключ>
 ```
 
 ## Согласие
 
 ```bash
-node "$CLAUDE_PROJECT_DIR/sorp-svod/bin/vhod.mjs" --согласие
-node "$CLAUDE_PROJECT_DIR/sorp-svod/bin/vhod.mjs" --отозвать
+node "$CLAUDE_PROJECT_DIR/sorp-svod/scripts/vhod.mjs" --согласие
+node "$CLAUDE_PROJECT_DIR/sorp-svod/scripts/vhod.mjs" --отозвать
 ```
 
 Отозвать можно в любой момент. Записанное раньше остаётся на стенде — об этом
@@ -56,7 +56,7 @@ node "$CLAUDE_PROJECT_DIR/sorp-svod/bin/vhod.mjs" --отозвать
 ## Выход
 
 ```bash
-node "$CLAUDE_PROJECT_DIR/sorp-svod/bin/vhod.mjs" --выйти
+node "$CLAUDE_PROJECT_DIR/sorp-svod/scripts/vhod.mjs" --выйти
 ```
 
 Забывает ключ на этой машине. Участник и его прошлые обращения в журнале
