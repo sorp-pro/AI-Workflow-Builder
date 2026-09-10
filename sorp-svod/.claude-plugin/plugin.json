@@ -1,6 +1,6 @@
 {
   "name": "sorp-svod",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "Walks the team through business-process gaps in the SORP registry and writes answers back. Asks your name on first run and issues a key. Your questions are logged only with your consent, off by default.",
   "author": {
     "name": "SORP"
