@@ -21,6 +21,18 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/sorp-svod/hooks/vybor.mjs\"",
+            "timeout": 8
+          }
+        ]
+      }
     ]
   }
 }

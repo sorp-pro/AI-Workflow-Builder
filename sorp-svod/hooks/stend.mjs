@@ -25,11 +25,14 @@ const ПРОКСИ =
 /** Тот же запрос через curl: он сам берёт прокси из окружения. */
 function черезCurl(адрес, { ключ, метод, тело, ждать }) {
   const доводы = ['-sS', '-m', String(Math.max(1, Math.floor(ждать / 1000))), '-X', метод, '-w', '\n%{http_code}'];
-  if (тело) доводы.push('-H', 'Content-Type: application/json; charset=utf-8', '--data-binary', JSON.stringify(тело));
+  // Тело — через стандартный ввод, а не аргументом: в Windows кириллица в
+  // аргументах командной строки портится по дороге до curl, а байты из
+  // stdin доходят как есть, в UTF-8.
+  if (тело) доводы.push('-H', 'Content-Type: application/json; charset=utf-8', '--data-binary', '@-');
   if (ключ) доводы.push('-H', `X-Builder-Key: ${ключ}`);
   доводы.push(адрес);
   return new Promise((готово) => {
-    execFile('curl', доводы, { encoding: 'utf8', timeout: ждать + 1000 }, (ошибка, вывод) => {
+    const процесс = execFile('curl', доводы, { encoding: 'utf8', timeout: ждать + 1000 }, (ошибка, вывод) => {
       if (ошибка && !вывод) {
         return готово({ вышло: false, код: 0, тело: {}, почему: `стенд недоступен через прокси: ${ошибка.message}` });
       }
@@ -43,6 +46,8 @@ function черезCurl(адрес, { ключ, метод, тело, ждать
       }
       готово({ вышло: код >= 200 && код < 300, код, тело: т, ...(код ? {} : { почему: 'стенд недоступен через прокси' }) });
     });
+    процесс.stdin?.on('error', () => {});
+    процесс.stdin?.end(тело ? Buffer.from(JSON.stringify(тело), 'utf8') : undefined);
   });
 }
 
