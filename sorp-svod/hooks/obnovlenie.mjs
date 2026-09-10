@@ -29,7 +29,10 @@ const ДЕРЕВО = `https://api.github.com/repos/${РЕПО}/git/trees/${ВЕ�
 /** Чаще не проверяем: у GitHub шестьдесят запросов в час на адрес, и офис за одним адресом их выест. */
 const РАЗ_В = 60 * 60 * 1000;
 
-const КОРЕНЬ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+// Плагин лежит в подпапке репозитория, а пути в дереве GitHub — от корня
+// репозитория. Поэтому корень — на два уровня выше хуков, а версия — в подпапке.
+const КОРЕНЬ = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
+const ВЕРСИЯ = 'sorp-svod/.claude-plugin/plugin.json';
 
 async function взять(адрес, ждать, как = 'text') {
   const сторож = new AbortController();
@@ -81,10 +84,10 @@ export async function обновить() {
   if (н.проверкаОбновления && Date.now() - н.проверкаОбновления < РАЗ_В) return null;
   записать({ проверкаОбновления: Date.now() });
 
-  const здесь = версия(existsSync(resolve(КОРЕНЬ, '.claude-plugin/plugin.json'))
-    ? readFileSync(resolve(КОРЕНЬ, '.claude-plugin/plugin.json'), 'utf8')
+  const здесь = версия(existsSync(resolve(КОРЕНЬ, ВЕРСИЯ))
+    ? readFileSync(resolve(КОРЕНЬ, ВЕРСИЯ), 'utf8')
     : '{}');
-  const там = версия(await взять(СЫРОЕ + '.claude-plugin/plugin.json', 3000));
+  const там = версия(await взять(СЫРОЕ + ВЕРСИЯ, 3000));
   if (!здесь || !там || !новее(там, здесь)) return null;
 
   const дерево = await взять(ДЕРЕВО, 3000, 'json');
