@@ -6,7 +6,7 @@
           {
             "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/hooks/nachalo.mjs\"",
-            "timeout": 10
+            "timeout": 20
           }
         ]
       }

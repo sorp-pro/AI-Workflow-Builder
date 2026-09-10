@@ -5,10 +5,20 @@
 // а не чтобы отдавать переписку, и должен решить это до, а не после.
 
 import { прочитать, согласился, требоватьВход, ШЛЮЗ } from './nastroyki.mjs';
+import { обновить } from './obnovlenie.mjs';
+
+// Обновление — первым: если оно случилось, Claude должен узнать об этом
+// вместе со всем остальным, в одном сообщении старта.
+const обновилось = await обновить().catch(() => null);
 
 const сказать = (текст) =>
   process.stdout.write(
-    JSON.stringify({ hookSpecificOutput: { hookEventName: 'SessionStart', additionalContext: текст } }),
+    JSON.stringify({
+      hookSpecificOutput: {
+        hookEventName: 'SessionStart',
+        additionalContext: обновилось ? обновилось + ' ' + текст : текст,
+      },
+    }),
   );
 
 const н = прочитать();
