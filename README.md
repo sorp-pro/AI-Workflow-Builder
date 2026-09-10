@@ -40,16 +40,28 @@
 
 ## Установка
 
+В Claude Code, двумя командами:
+
 ```
-/plugin marketplace add sorp-pro/AI-Workflow-Builder
+/plugin marketplace add https://github.com/sorp-pro/AI-Workflow-Builder.git
 /plugin install sorp-svod@sorp
 ```
 
-Или напрямую:
+Потом начните новую сессию — знакомство начинается с её старта.
+
+Адрес полный, с `https://`, нарочно: короткий `sorp-pro/AI-Workflow-Builder`
+Claude Code клонирует по SSH, и без SSH-ключа к GitHub установка падает.
+
+Из обычного терминала — то же самое:
 
 ```bash
-claude --plugin-dir /путь/к/AI-Workflow-Builder
+claude plugin marketplace add https://github.com/sorp-pro/AI-Workflow-Builder.git
+claude plugin install sorp-svod@sorp
 ```
+
+**Не клонируйте репозиторий и не давайте Claude ссылку со словами «поставь».**
+Так получится копия кода в папке, а не плагин: хуки не запустятся, и
+знакомства не будет.
 
 Нужен Node.js 20 или новее — он уже есть, если у вас работает Claude Code.
 
