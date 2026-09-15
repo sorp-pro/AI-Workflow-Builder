@@ -63,21 +63,20 @@ node "${CLAUDE_PLUGIN_ROOT}/scripts/progon.mjs"
 node "${CLAUDE_PLUGIN_ROOT}/scripts/voprosy.mjs" PROC-xxx PROC-yyy
 ```
 
-Скрипт пишет документы вопросов и перечень `vyhod/processy/voprosy/batch.json`.
-Выложи их на страницу вопросов инструментом Artifact:
-`action: "write_db"`, `db_op: "batch"`, записи — из `batch.json`
-(`collection: "processy"`, `doc_id`, `file_path`).
+Скрипт пишет документы вопросов в `vyhod/processy/voprosy/`. Выложи их на стенд:
 
-Адрес страницы — в `SORP_VOPROSY_URL`. Нет адреса — спроси человека ссылку на
-страницу вопросов команды. Её нет вовсе — опубликуй свою из шаблона
-`${CLAUDE_PLUGIN_ROOT}/shablony/voprosy.html` с `capabilities: {"db": {"rules": [{"path": "processy", "read": "view", "write": "admin"}, {"path": "otvety", "read": "view", "write": "interact"}]}}`
-и дай человеку ссылку.
+```bash
+node "${CLAUDE_PLUGIN_ROOT}/scripts/stend.mjs" vylozhit PROC-xxx PROC-yyy
+```
 
-Документ, который уже есть на странице, пиши с `if_version`: прочитай его
-`read_db` перед записью, если версия неизвестна.
+Нужен ключ участника с ролью (не гость): `stend.mjs vhod` покажет, кто вошёл.
+Вопрос с тем же ключом обновляется, новый заводится, вопрос, которого в модели
+больше нет, снимается; уже внесённые не трогаются.
 
-Скажи человеку одной строкой: сколько вопросов выложено, по каким процессам, и что
-новые на странице появляются сами — обновлять её не нужно.
+Скажи человеку одной строкой: сколько вопросов выложено и где на них отвечают —
+в Claude навыком `otvetit-na-voprosy` или в форме стенда
+(`https://workflow-builder-934054964.development.catalystserverless.com/server/builder_api/voprosy`)
+с ключом участника, из любой организации.
 
 ### Пока агенты работают
 
