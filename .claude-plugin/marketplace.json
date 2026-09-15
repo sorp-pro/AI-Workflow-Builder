@@ -3,7 +3,16 @@
   "owner": {
     "name": "SORP"
   },
+  "metadata": {
+    "description": "SORP team plugins: process registry review and runnable process models with scenario runs, shared questions and the simulation stand."
+  },
   "plugins": [
+    {
+      "name": "sorp-processy",
+      "displayName": "SORP Process Models",
+      "source": "./sorp-processy",
+      "description": "Builds a runnable model of a SORP map process, derives and runs every test scenario, publishes open questions to a shared page, applies answers back and releases models to the simulation stand with UI tests. Code only: map data stays in your working folder."
+    },
     {
       "name": "sorp-svod",
       "displayName": "SORP Process Review",

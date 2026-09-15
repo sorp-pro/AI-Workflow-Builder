@@ -1,0 +1,257 @@
+<title>Вопросы по процессам SORP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#f3f4f1; --paper:#ffffff; --ink:#1d2327; --muted:#5d6a70; --line:#d9ddd8;
+  --accent:#1f5f7a; --accent-soft:#e2eef3; --ok:#2f7a4b; --ok-soft:#e3f1e8; --warn:#9a5b0f; --warn-soft:#f7ecdc; --crit:#a33a2c; --crit-soft:#f6e3e0;
+  --sans:"Golos Text",system-ui,"Segoe UI",Arial,sans-serif; --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#14191b; --paper:#1c2326; --ink:#e6ebec; --muted:#9aa8ad; --line:#2f393d;
+  --accent:#6fb3cf; --accent-soft:#1d3440; --ok:#79c296; --ok-soft:#1d3327; --warn:#e0a85a; --warn-soft:#3a2d1a; --crit:#e7897b; --crit-soft:#3d2320;
+}}
+:root[data-theme="dark"]{
+  --ground:#14191b; --paper:#1c2326; --ink:#e6ebec; --muted:#9aa8ad; --line:#2f393d;
+  --accent:#6fb3cf; --accent-soft:#1d3440; --ok:#79c296; --ok-soft:#1d3327; --warn:#e0a85a; --warn-soft:#3a2d1a; --crit:#e7897b; --crit-soft:#3d2320;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font:15px/1.5 var(--sans);padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:16px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 20px}
+h1{font-size:22px;font-weight:700;margin:0;text-wrap:balance}
+.sum{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-variant-numeric:tabular-nums}
+.sum b{color:var(--ink)}
+.status{font-size:13px;color:var(--muted)}
+.arrived{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:var(--accent-soft);border:1px solid var(--accent);border-radius:10px;padding:10px 14px}
+.layout{display:grid;grid-template-columns:290px 1fr;gap:20px;align-items:start}
+@media (max-width:820px){.layout{grid-template-columns:1fr}}
+nav{background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow-y:auto}
+@media (max-width:820px){nav{position:static;max-height:300px}}
+.filter{display:flex;gap:6px;padding:10px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.chip{font:inherit;font-size:13px;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:3px 10px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.proc{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:9px 12px;border-bottom:1px solid var(--line);color:inherit;text-decoration:none}
+.proc:last-child{border-bottom:0}
+.proc:hover{background:var(--accent-soft)}
+.proc[aria-current="true"]{background:var(--accent-soft);box-shadow:inset 3px 0 var(--accent)}
+.proc.all .name{font-weight:600}
+.proc .code{font:12px var(--mono);color:var(--muted)}
+.proc .name{grid-column:1/2;font-size:14px;line-height:1.3}
+.proc .cnt{grid-row:1/3;grid-column:2;align-self:center;display:flex;gap:4px}
+.cnt span{font:12px var(--mono);font-variant-numeric:tabular-nums;padding:2px 7px;border-radius:6px;background:var(--warn-soft);color:var(--warn)}
+.cnt span.done{background:var(--ok-soft);color:var(--ok)}
+.cnt span.new{background:var(--accent);color:var(--paper)}
+main{display:grid;gap:14px;min-width:0}
+.head{display:grid;gap:4px}
+.head h2{margin:0;font-size:20px;text-wrap:balance}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
+.meta code{font-family:var(--mono)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{font:inherit;font-size:14px;border:1px solid var(--accent);background:var(--accent);color:var(--paper);border-radius:8px;padding:6px 14px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+.q{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:12px}
+.q.answered{border-color:color-mix(in srgb,var(--ok) 45%,var(--line))}
+.q.fresh{box-shadow:0 0 0 2px var(--accent)}
+.qtop{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12px}
+.qproc{font-size:13px;color:var(--muted);text-decoration:none}
+.qproc:hover{color:var(--accent);text-decoration:underline}
+.pill{font:12px var(--mono);padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent)}
+.pill.block{background:var(--crit-soft);color:var(--crit)}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.new{background:var(--accent);color:var(--paper)}
+.qtext{font-size:16px;font-weight:600;margin:0;text-wrap:pretty}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;cursor:pointer}
+.opt:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.opt input{margin-top:4px;accent-color:var(--accent)}
+.opt .why{grid-column:2;font-size:13px;color:var(--muted)}
+.rec{font-size:12px;color:var(--ok);font-weight:600;margin-left:6px;white-space:nowrap}
+textarea,input[type=text]{font:inherit;color:var(--ink);background:var(--ground);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
+textarea{min-height:60px;resize:vertical}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.searched{font-size:13px;color:var(--muted)}
+.searched summary{cursor:pointer}
+.saved{font-size:13px;color:var(--ok)}
+.err{font-size:13px;color:var(--crit)}
+.empty{background:var(--paper);border:1px dashed var(--line);border-radius:10px;padding:24px;color:var(--muted)}
+.who{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+.who input{width:220px}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Вопросы по процессам SORP</h1>
+    <div class="sum" id="sum"></div>
+    <div class="who"><label for="who">Кто отвечает</label><input type="text" id="who" placeholder="Имя"></div>
+  </header>
+  <div class="status" id="status">Загружаю вопросы…</div>
+  <div class="arrived" id="arrived" hidden><span id="arrived-text"></span><button class="btn" id="arrived-show">Показать</button></div>
+  <div class="layout">
+    <nav aria-label="Процессы">
+      <div class="filter" role="group" aria-label="Какие процессы в списке">
+        <button class="chip" id="f-open" aria-pressed="true">С открытыми</button>
+        <button class="chip" id="f-all" aria-pressed="false">Все</button>
+      </div>
+      <div id="list"></div>
+    </nav>
+    <main id="main"></main>
+  </div>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const АДРЕСАТ = { 'владелец': 'владельцу', 'аналитик': 'аналитику', 'стол': 'столу', 'настройка': 'настройке' };
+const ВСЕ = 'все';
+function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch { return null; } }
+
+// «Новый» — вопрос, появившийся после прошлого визита. Метка визита сдвигается при
+// открытии страницы, а пришедшее во время работы копится в плашке «пришло», чтобы
+// карточки не прыгали под рукой.
+const прошлыйВизит = ls('voprosy:seen') || '1970-01-01T00:00:00Z';
+ls('voprosy:seen', new Date().toISOString());
+
+const state = { процессы: [], ответы: new Map(), текущий: null, фильтр: 'open', черновики: new Map(), db: null, известные: null, пришло: new Set(), отложено: false };
+
+$('#who').value = ls('voprosy:who') || '';
+$('#who').addEventListener('input', (e) => ls('voprosy:who', e.target.value));
+
+const открыт = (q) => !state.ответы.has(q.key);
+const новый = (q) => открыт(q) && (q.added || '') > прошлыйВизит;
+const открытых = (п) => п.questions.filter(открыт).length;
+const новых = (п) => п.questions.filter(новый).length;
+const всеОткрытые = () => state.процессы.flatMap((п) => п.questions.filter(открыт).map((q) => ({ п, q })))
+  .sort((a, b) => (b.q.blocks - a.q.blocks) || (b.q.added || '').localeCompare(a.q.added || '') || a.п.id.localeCompare(b.п.id));
+
+function renderList() {
+  const всего = state.процессы.reduce((a, п) => a + п.questions.length, 0);
+  const отвечено = state.процессы.reduce((a, п) => a + п.questions.filter((q) => !открыт(q)).length, 0);
+  const блок = state.процессы.reduce((a, п) => a + п.questions.filter((q) => q.blocks && открыт(q)).length, 0);
+  $('#sum').innerHTML = `<span>процессов <b>${state.процессы.length}</b></span><span>вопросов <b>${всего}</b></span><span>отвечено <b>${отвечено}</b></span><span>блокирующих открыто <b>${блок}</b></span>`;
+  const н = state.процессы.reduce((a, п) => a + новых(п), 0);
+  const о = всего - отвечено;
+  const общая = `<a class="proc all" href="#${ВСЕ}" aria-current="${state.текущий === ВСЕ}"><span class="code">все процессы</span><span class="cnt">${н ? `<span class="new">${н} нов.</span>` : ''}<span class="${о ? '' : 'done'}">${о ? о + ' откр.' : 'готово'}</span></span><span class="name">Все открытые вопросы</span></a>`;
+  const видны = state.процессы.filter((п) => state.фильтр === 'all' || открытых(п) > 0 || п.id === state.текущий);
+  $('#list').innerHTML = общая + видны.map((п) => {
+    const ок = открытых(п), нк = новых(п);
+    return `<a class="proc" href="#${п.id}" aria-current="${п.id === state.текущий}"><span class="code">${esc(п.id)} · ${esc(п.kod)}</span><span class="cnt">${нк ? `<span class="new">${нк} нов.</span>` : ''}<span class="${ок ? '' : 'done'}">${ок ? ок + ' откр.' : 'готово'}</span></span><span class="name">${esc(п.title)}</span></a>`;
+  }).join('');
+}
+
+function карточка(п, q, сПроцессом) {
+  const о = state.ответы.get(q.key);
+  const ч = state.черновики.get(q.key) || (о ? { choice: о.choice, comment: о.comment || '' } : { choice: null, comment: '' });
+  const имя = 'q_' + q.key;
+  const opts = q.options.map((o, j) => `<label class="opt"><input type="radio" name="${esc(имя)}" value="${j}" ${ч.choice === j ? 'checked' : ''}><span>${esc(o.text)}${o.recommended ? '<span class="rec">рекомендуем</span>' : ''}</span>${o.why ? `<span class="why">${esc(o.why)}</span>` : ''}</label>`).join('')
+    + `<label class="opt"><input type="radio" name="${esc(имя)}" value="-1" ${ч.choice === -1 ? 'checked' : ''}><span>Другое — напишу ниже</span></label>`;
+  return `<article class="q ${о ? 'answered' : ''} ${state.пришло.has(q.key) ? 'fresh' : ''}" data-key="${esc(q.key)}" data-proc="${esc(п.id)}">
+    ${сПроцессом ? `<a class="qproc" href="#${esc(п.id)}">${esc(п.id)} · ${esc(п.title)}</a>` : ''}
+    <div class="qtop">${новый(q) ? '<span class="pill new">новый</span>' : ''}<span class="pill">${esc(q.id)}</span>${q.blocks ? '<span class="pill block">блокирует модель</span>' : ''}${q.ask ? `<span class="pill">вопрос ${esc(АДРЕСАТ[q.ask] || q.ask)}</span>` : ''}${q.address ? `<span class="meta"><code>${esc(q.address)}</code></span>` : ''}${о ? `<span class="pill ok">ответ: ${esc(о.author || 'без имени')}, ${esc(new Date(о.at).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }))}</span>` : ''}</div>
+    <p class="qtext">${esc(q.question)}</p>
+    <div class="opts" role="radiogroup" aria-label="Варианты">${opts}</div>
+    <label class="searched" for="c_${esc(q.key)}">Комментарий или свой ответ</label>
+    <textarea id="c_${esc(q.key)}" data-role="comment">${esc(ч.comment)}</textarea>
+    ${q.searched ? `<details class="searched"><summary>Где уже искали ответ</summary>${esc(q.searched)}</details>` : ''}
+    <div class="row"><button class="btn" data-role="save">${о ? 'Изменить ответ' : 'Ответить'}</button><span data-role="msg"></span></div>
+  </article>`;
+}
+
+function renderMain() {
+  state.отложено = false;
+  if (state.текущий === ВСЕ) {
+    const список = всеОткрытые();
+    $('#main').innerHTML = `<div class="head"><h2>Все открытые вопросы</h2><div class="meta"><span>открыто ${список.length}</span><span>сначала блокирующие, затем новые</span></div>
+      <div class="row"><button class="btn ghost" data-copy="${ВСЕ}">Скопировать ссылку</button><span class="status" data-role="copied"></span></div></div>`
+      + (список.length ? список.map(({ п, q }) => карточка(п, q, true)).join('') : `<div class="empty">${state.процессы.length ? 'Открытых вопросов нет. Новые появятся здесь сами.' : 'Вопросов пока нет. Они появятся здесь сами, как только агенты их зададут.'}</div>`);
+    return;
+  }
+  const п = state.процессы.find((x) => x.id === state.текущий);
+  if (!п) { $('#main').innerHTML = `<div class="empty">Вопросов по ${esc(state.текущий)} пока нет. Они появятся здесь сами.</div>`; return; }
+  $('#main').innerHTML = `<div class="head"><h2>${esc(п.title)}</h2><div class="meta"><code>${esc(п.id)}</code><span>${esc(п.kod)}</span>${п.kat ? `<span>категория ${esc(п.kat)}</span>` : ''}${п.edition ? `<span>карта ${esc(п.edition)}</span>` : ''}<span>вопросов ${п.questions.length}, открыто ${открытых(п)}</span></div>
+    <div class="row"><button class="btn ghost" data-copy="${esc(п.id)}">Скопировать ссылку на процесс</button><span class="status" data-role="copied"></span></div></div>`
+    + (п.questions.length ? [...п.questions].sort((a, b) => (открыт(b) - открыт(a)) || (b.blocks - a.blocks)).map((q) => карточка(п, q, false)).join('') : '<div class="empty">По этому процессу вопросов нет.</div>');
+}
+
+// Перерисовка под курсором сбрасывает ввод, поэтому, пока человек в карточке,
+// перерисовка откладывается до ухода фокуса.
+function обновить() {
+  renderList();
+  if (document.activeElement?.closest?.('.q')) { state.отложено = true; return; }
+  renderMain();
+}
+$('#main').addEventListener('focusout', () => setTimeout(() => { if (state.отложено && !document.activeElement?.closest?.('.q')) renderMain(); }, 0));
+
+$('#main').addEventListener('change', (e) => {
+  const card = e.target.closest('.q'); if (!card || e.target.type !== 'radio') return;
+  const k = card.dataset.key; const ч = state.черновики.get(k) || { choice: null, comment: card.querySelector('textarea').value };
+  ч.choice = Number(e.target.value); state.черновики.set(k, ч);
+});
+$('#main').addEventListener('input', (e) => {
+  if (e.target.dataset.role !== 'comment') return;
+  const card = e.target.closest('.q'); const k = card.dataset.key;
+  const ч = state.черновики.get(k) || { choice: state.ответы.get(k)?.choice ?? null, comment: '' };
+  ч.comment = e.target.value; state.черновики.set(k, ч);
+});
+$('#main').addEventListener('click', async (e) => {
+  const копия = e.target.dataset.copy;
+  if (копия) {
+    const ссылка = location.href.split('#')[0] + '#' + копия; const мет = e.target.parentElement.querySelector('[data-role="copied"]');
+    try { await navigator.clipboard.writeText(ссылка); мет.textContent = 'Ссылка скопирована'; } catch { мет.textContent = ссылка; }
+    return;
+  }
+  if (e.target.dataset.role !== 'save') return;
+  const card = e.target.closest('.q'); const msg = card.querySelector('[data-role="msg"]');
+  const п = state.процессы.find((x) => x.id === card.dataset.proc); const q = п?.questions.find((x) => x.key === card.dataset.key);
+  if (!q) { msg.className = 'err'; msg.textContent = 'Вопрос сняли, пока вы отвечали.'; return; }
+  const checked = card.querySelector('input[type=radio]:checked');
+  const comment = card.querySelector('textarea').value.trim();
+  if (!checked) { msg.className = 'err'; msg.textContent = 'Выберите вариант или «Другое».'; return; }
+  const choice = Number(checked.value);
+  if (choice === -1 && !comment) { msg.className = 'err'; msg.textContent = 'Для «Другое» напишите ответ в комментарии.'; return; }
+  if (!state.db) { msg.className = 'err'; msg.textContent = 'Хранилище недоступно в этом просмотре — ответ не сохранится.'; return; }
+  e.target.disabled = true; msg.className = 'status'; msg.textContent = 'Сохраняю…';
+  const doc = { proc: п.id, q: q.id, question: q.question, choice, text: choice >= 0 ? q.options[choice].text : '', comment, author: $('#who').value.trim(), at: new Date().toISOString() };
+  try {
+    await state.db.doc('otvety/' + q.key).set(doc);
+    state.черновики.delete(q.key); state.пришло.delete(q.key);
+    e.target.blur();
+  } catch (err) {
+    msg.className = 'err';
+    msg.textContent = err?.code === 'quota_exceeded' ? 'Хранилище заполнено — сообщите тому, кто ведёт стенд.' : 'Не сохранилось. Попробуйте ещё раз.';
+    e.target.disabled = false;
+  }
+});
+
+function выбратьИзАдреса() { state.текущий = decodeURIComponent(location.hash.slice(1)) || ВСЕ; renderList(); renderMain(); }
+window.addEventListener('hashchange', выбратьИзАдреса);
+for (const [id, f] of [['#f-open', 'open'], ['#f-all', 'all']]) $(id).addEventListener('click', () => { state.фильтр = f; $('#f-open').setAttribute('aria-pressed', f === 'open'); $('#f-all').setAttribute('aria-pressed', f === 'all'); renderList(); });
+$('#arrived-show').addEventListener('click', () => { $('#arrived').hidden = true; if (location.hash !== '#' + ВСЕ) location.hash = ВСЕ; else renderMain(); window.scrollTo({ top: 0 }); });
+
+state.текущий = decodeURIComponent(location.hash.slice(1)) || ВСЕ;
+renderList(); renderMain();
+(async () => {
+  const db = window.claude ? await window.claude.use('db') : null;
+  if (!db) { $('#status').textContent = 'Хранилище вопросов недоступно в этом просмотре. Откройте страницу на claude.ai.'; return; }
+  state.db = db;
+  const упало = () => { $('#status').textContent = 'Связь с хранилищем прервалась. Обновите страницу.'; };
+  db.collection('processy').onSnapshot((snap) => {
+    state.процессы = snap.docs.map((d) => d.data()).filter(Boolean).sort((a, b) => a.id.localeCompare(b.id));
+    const ключи = new Set(state.процессы.flatMap((п) => п.questions.map((q) => q.key)));
+    if (state.известные) {
+      for (const k of ключи) if (!state.известные.has(k)) state.пришло.add(k);
+      const н = [...state.пришло].filter((k) => ключи.has(k) && !state.ответы.has(k)).length;
+      $('#arrived').hidden = !н;
+      $('#arrived-text').textContent = `Пришло новых вопросов: ${н}`;
+    }
+    state.известные = ключи;
+    $('#status').textContent = 'Новые вопросы появляются сами, обновлять страницу не нужно.';
+    обновить();
+  }, упало);
+  db.collection('otvety').limit(1000).onSnapshot((snap) => {
+    state.ответы = new Map(snap.docs.map((d) => [d.id, d.data()]));
+    обновить();
+  }, упало);
+})();
+</script>

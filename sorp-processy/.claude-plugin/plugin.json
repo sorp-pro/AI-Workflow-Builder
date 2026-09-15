@@ -1,0 +1,9 @@
+{
+  "name": "sorp-processy",
+  "version": "0.1.0",
+  "description": "Process models for SORP: builds a runnable model of a map process, derives and runs every test scenario, publishes open questions to a shared page, applies answers back and releases models to the SORP simulation stand with generated UI tests. Code only — map data and presentations stay in your working folder.",
+  "author": {
+    "name": "SORP"
+  },
+  "keywords": ["processes", "models", "scenarios", "simulation", "questions"]
+}
