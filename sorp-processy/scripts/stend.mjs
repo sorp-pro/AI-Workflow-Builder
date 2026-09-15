@@ -9,14 +9,21 @@
 //   node stend.mjs otvety [PROC-xxx]           новые ответы, ждущие внесения (JSON)
 //   node stend.mjs vnesen <id ответа> "что изменилось в модели"
 //   node stend.mjs otklonen <id ответа> "почему не внесён"
+//   node stend.mjs k-obrabotke                 процессы с новыми ответами, над которыми никто не работает (JSON)
+//   node stend.mjs zanyat PROC-xxx [кто]       отметить: над моделью работают (агент или внесение ответов)
+//   node stend.mjs osvobodit PROC-xxx          снять отметку
+//
+// Отметка «занято» — файл vyhod/processy/zanyato/PROC-xxx.json в рабочей папке. Два правщика
+// одной модели затирают друг друга, поэтому внесение ответов обходит занятые процессы.
+// Отметка старше ЗАНЯТО_ЧАСОВ считается брошенной: агент мог упасть, не сняв её.
 //
 // Ключ — в ~/.sorp-processy/klyuch.json; если его нет, берётся ключ билдера или разбора
 // на этой машине: один человек — один участник стенда.
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, rmSync } from 'node:fs';
 import { homedir } from 'node:os';
 import path from 'node:path';
-import { ВЫХОД, напрямую } from './mesto.mjs';
+import { ВЫХОД, МОДЕЛИ, напрямую } from './mesto.mjs';
 
 export const СТЕНД = (process.env.SORP_API_URL || 'https://workflow-builder-934054964.development.catalystserverless.com/server/builder_api').replace(/\/$/, '');
 const ГНЕЗДО = path.join(homedir(), '.sorp-processy', 'klyuch.json');
@@ -44,6 +51,18 @@ async function api(путь, { метод = 'GET', тело, безКлюча = 
   } finally { clearTimeout(будильник); }
 }
 const печать = (x) => console.log(JSON.stringify(x, null, 1));
+
+const ЗАНЯТО = path.join(ВЫХОД, 'zanyato');
+const ЗАНЯТО_ЧАСОВ = 3;
+/** Отметка «над моделью работают» — или null, если её нет или она брошена. */
+export function занят(proc) {
+  const ф = path.join(ЗАНЯТО, `${proc}.json`);
+  if (!existsSync(ф)) return null;
+  try {
+    const з = JSON.parse(readFileSync(ф, 'utf8'));
+    return Date.now() - new Date(з.с).getTime() > ЗАНЯТО_ЧАСОВ * 3600_000 ? null : з;
+  } catch { return null; }
+}
 
 export async function главная(argv = process.argv.slice(2)) {
   const [команда, ...арг] = argv;
@@ -95,8 +114,42 @@ export async function главная(argv = process.argv.slice(2)) {
       const т = await api(`/answers/${encodeURIComponent(id)}/${команда === 'vnesen' ? 'applied' : 'rejected'}`, { метод: 'POST', тело: { note: заметка.join(' ') } });
       return console.log(`Ответ ${т.ответ}: ${т.состояние}; вопрос — ${т.состояние_вопроса}`);
     }
+    case 'zanyat': {
+      const [proc, ...кто] = арг;
+      if (!/^PROC-\d{3}$/.test(proc || '')) throw new Error('zanyat PROC-xxx');
+      mkdirSync(ЗАНЯТО, { recursive: true });
+      writeFileSync(path.join(ЗАНЯТО, `${proc}.json`), JSON.stringify({ proc, кто: кто.join(' ') || 'без имени', с: new Date().toISOString() }, null, 1));
+      return console.log(`${proc}: занято`);
+    }
+    case 'osvobodit': {
+      const [proc] = арг;
+      const ф = path.join(ЗАНЯТО, `${proc}.json`);
+      if (existsSync(ф)) rmSync(ф);
+      return console.log(`${proc}: свободно`);
+    }
+    case 'k-obrabotke': {
+      const т = await api('/answers');
+      const поПроцессам = new Map();
+      for (const о of т.ответы) {
+        const п = поПроцессам.get(о.proc_id) || { proc: о.proc_id, ответов: 0, споров: new Set(), вопросов: new Set() };
+        п.ответов++;
+        п.вопросов.add(о.q_key);
+        if (о.вопрос?.state === 'спор') п.споров.add(о.q_key);
+        поПроцессам.set(о.proc_id, п);
+      }
+      const есть = (proc) => existsSync(path.join(МОДЕЛИ, `${proc}.json`));
+      const итог = { свободны: [], заняты: [], нет_модели: [] };
+      for (const п of [...поПроцессам.values()].sort((a, b) => a.proc.localeCompare(b.proc))) {
+        const строка = { proc: п.proc, ответов: п.ответов, вопросов: п.вопросов.size, споров: п.споров.size };
+        const з = занят(п.proc);
+        if (!есть(п.proc)) итог.нет_модели.push(строка);
+        else if (з) итог.заняты.push({ ...строка, кто: з.кто, с: з.с });
+        else итог.свободны.push(строка);
+      }
+      return печать(итог);
+    }
     default:
-      console.log('Команды: vhod · registraciya · voprosy · otvet · vylozhit · otvety · vnesen · otklonen');
+      console.log('Команды: vhod · registraciya · voprosy · otvet · vylozhit · otvety · vnesen · otklonen · k-obrabotke · zanyat · osvobodit');
   }
 }
 

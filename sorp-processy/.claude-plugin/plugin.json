@@ -1,7 +1,7 @@
 {
   "name": "sorp-processy",
-  "version": "0.2.0",
-  "description": "Process models for SORP: builds a runnable model of a map process, derives and runs every test scenario, publishes open questions to the SORP stand, lets anyone with a stand key answer them right in Claude or in the stand web form, applies answers back and releases models to the simulation stand with UI tests. Code only — map data stays in your working folder.",
+  "version": "0.3.0",
+  "description": "Process models for SORP: builds a runnable model of a map process once, derives and runs every test scenario, publishes open questions to the SORP stand, lets anyone with a stand key answer them in Claude or in the stand web form, and applies answers back incrementally — agents pick up answers when they start, a scheduled pass applies them to finished models. Releases models to the simulation stand with UI tests. Code only — map data stays in your working folder.",
   "author": {
     "name": "SORP"
   },
