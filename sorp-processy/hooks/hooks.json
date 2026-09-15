@@ -1,0 +1,27 @@
+{
+  "hooks": {
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/sostoyanie.mjs\" zapisat --prichina szhatie --hook",
+            "timeout": 20
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/sostoyanie.mjs\" pokazat --hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
