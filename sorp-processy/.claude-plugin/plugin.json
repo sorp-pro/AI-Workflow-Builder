@@ -1,9 +1,17 @@
 {
   "name": "sorp-processy",
-  "version": "0.4.0",
-  "description": "Process models for SORP: builds a runnable model of a map process once, derives and runs every test scenario, publishes open questions to the SORP stand, lets anyone with a stand key answer them in Claude or in the stand web form, and applies answers back incrementally — agents pick up answers when they start, a scheduled pass applies them to finished models. Releases models to the simulation stand with UI tests. Code only — map data stays in your working folder.",
+  "version": "0.5.0",
+  "description": "Process models for SORP: builds a runnable model of a map process once, derives and runs every test scenario, publishes open questions to the SORP stand, lets anyone with a stand key answer them in Claude or in the stand web form, and applies answers back incrementally. A completeness gate holds every fact of the map — step, desk, deadline, refusal, number, decision — either expressed in the model or listed as a deliberate skip with a reason. Role cards and virtual users turn desks into people, so scenarios also check who may do a step: adjacent desk, substitute, two desks in one pair of hands. Releases models to the simulation stand with UI tests. Code only — map data stays in your working folder.",
   "author": {
     "name": "SORP"
   },
-  "keywords": ["processes", "models", "scenarios", "simulation", "questions"]
+  "keywords": [
+    "processes",
+    "models",
+    "scenarios",
+    "simulation",
+    "questions",
+    "roles",
+    "coverage"
+  ]
 }

@@ -23,6 +23,7 @@ export function проверить(м) {
   let кал = null;
   try { кал = календарь(м); if (!/^\d{4}-\d{2}-\d{2}$/.test(кал.start) || !Array.isArray(кал.workdays) || кал.hours.length !== 2) о('calendar: start ГГГГ-ММ-ДД, workdays [1..7], hours ["09:00","18:00"]'); } catch (e) { о(`calendar: ${e.message}`); }
 
+  for (const x of м.coverage_skip || []) if (!x?.ref || !String(x.why || '').trim()) п(`coverage_skip: у пропуска ${x?.ref ?? 'без ref'} нет why — не засчитывается`);
   const столы = new Set(м.desks.map((d) => d.code));
   const внешние = new Set((м.externals || []).map((x) => x.id));
   const записи = new Set((м.records || []).map((r) => r.key));
